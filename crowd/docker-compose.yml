@@ -1,0 +1,35 @@
+version: "3.2"
+services:
+  crowd:
+    image: atlassian/crowd:4-jdk11
+    container_name: atlassian-crowd
+    ports:
+      - 8095:8095
+    environment:
+      - JAVA_OPTS=-javaagent:/opt/atlassian/atlassian-agent.jar
+      # Memory / Heap Size
+      - JVM_MINIMUM_MEMORY=512M
+      - JVM_MAXIMUM_MEMORY=2048M
+      # Database
+      - ATL_JDBC_URL=jdbc:postgresql://atlassian-main-db:5432/crowd
+      - ATL_JDBC_USER=crowd
+      - ATL_JDBC_PASSWORD=crowd
+      - ATL_DB_TYPE=postgresql
+      # Home Directories
+      # - CROWD_HOME=/var/atlassian/application-data/crowd
+    volumes:
+      - type: bind
+        source: ./application-data
+        target: /var/atlassian/application-data/crowd
+    volumes:
+      - type: bind
+        source: ../atlassian-agent/atlassian-agent.jar
+        target: /opt/atlassian/atlassian-agent.jar
+    networks:
+      atlassian_network:
+        aliases:
+          - atlassian-crowd
+
+networks:
+  atlassian_network:
+    external: true
